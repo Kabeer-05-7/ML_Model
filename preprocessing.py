@@ -8,7 +8,6 @@ print("Columns :", data.columns.tolist())
 # Handling missing values
 print("\nMissing values before:\n", data.isnull().sum())
 data.dropna(subset=["Delivery_Time"], inplace=True)
-
 numeric_cols = data.select_dtypes(include=np.number).columns
 for col in numeric_cols:
     data[col] = data[col].fillna(data[col].median())
@@ -19,14 +18,14 @@ for col in categorical_cols:
 
 print("\nMissing values after :\n", data.isnull().sum())
 print("\nDuplicate rows before:", data.duplicated().sum())
-
+#  Drop duplicated value ------> (Order Id)
 data.drop_duplicates(subset=["Order_ID"], keep="first", inplace=True)
 data.reset_index(drop=True, inplace=True)
 print("Duplicate rows after :", data.duplicated().sum())
 
 # Order_ID → plain string
 data["Order_ID"] = data["Order_ID"].astype(str).str.strip()
-
+# Extract latitude and longitude from location 
 data["Customer_Lat"] = data["Customer_Location"].apply(lambda x: float(ast.literal_eval(x)[0]))
 data["Customer_Lon"] = data["Customer_Location"].apply(lambda x: float(ast.literal_eval(x)[1]))
 data.drop(columns=["Customer_Location"], inplace=True)
@@ -35,6 +34,7 @@ data["Restaurant_Lat"] = data["Restaurant_Location"].apply(lambda x: float(ast.l
 data["Restaurant_Lon"] = data["Restaurant_Location"].apply(lambda x: float(ast.literal_eval(x)[1]))
 data.drop(columns=["Restaurant_Location"], inplace = True)
 
+# Convert numeric columns to proper data types {errors="coerce" converts invalid values to NaN}
 data["Distance"] = pd.to_numeric(data["Distance"],errors="coerce").astype("float64")
 data["Delivery_Person_Experience"] = pd.to_numeric(data["Delivery_Person_Experience"],errors="coerce").astype("Int64")
 data["Restaurant_Rating"] = pd.to_numeric(data["Restaurant_Rating"],errors="coerce").astype("float32")
@@ -52,7 +52,6 @@ data["Order_Time"]         = pd.Categorical(data["Order_Time"],
                                categories=["Morning", "Afternoon", "Evening", "Night"], ordered=True)
  
 # Unordered categorical columns
-# No natural ranking between Sunny / Rainy or Car / Bike — so ordered=False
 data["Weather_Conditions"] = pd.Categorical(data["Weather_Conditions"] , ordered = False)
 data["Vehicle_Type"] = pd.Categorical(data["Vehicle_Type"] , ordered = False)
 
