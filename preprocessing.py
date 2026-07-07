@@ -55,10 +55,9 @@ def preprocess(data):
     # Unordered categorical columns
     data["Weather_Conditions"] = pd.Categorical(data["Weather_Conditions"] , ordered = False)
     data["Vehicle_Type"] = pd.Categorical(data["Vehicle_Type"] , ordered = False)
-
-    print("\n── Shape           :", data.shape)
-    print("── Missing values  :", data.isnull().sum().sum())
-    print("\n── dtypes ──\n",      data.dtypes)
-    print("\n── First 3 rows ──\n", data.head(3))
+    # print("\n── Shape           :", data.shape)
+    # print("── Missing values  :", data.isnull().sum().sum())
+    # print("\n── dtypes ──\n",      data.dtypes)
+    # print("\n── First 3 rows ──\n", data.head(3))
     
     return data
