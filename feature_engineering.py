@@ -6,14 +6,13 @@ from sklearn.preprocessing import LabelEncoder
 data = pd.read_csv("Food_Delivery_Time_Prediction.csv")
 data = preprocess(data)
 def feature_engineering(data):
-    # Calculates geographic distance (km) between restaurant and customer using Haversine formula
     R = 6371  # Earth radius in km
-    
     lat1 = np.radians(data["Restaurant_Lat"])
     lat2 = np.radians(data["Customer_Lat"])
     dlat = np.radians(data["Customer_Lat"] - data["Restaurant_Lat"])
     dlon = np.radians(data["Customer_Lon"] - data["Restaurant_Lon"])
     
+    # Calculates geographic distance (km) between restaurant and customer using Haversine formula
     a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
     data["Haversine_Distance_km"] = 2 * R * np.arcsin(np.sqrt(a))
     
@@ -30,7 +29,6 @@ def feature_engineering(data):
         data["Traffic_Conditions"].map(traffic_rank).astype(int) *
         data["Weather_Conditions"].map(weather_rank).astype(int)
     )
-    
     # Average Rating (mean of restaurant + customer rating)
     # Why: A single satisfaction score summarising both sides of the transaction.
     
@@ -43,7 +41,6 @@ def feature_engineering(data):
     # Log transform Distance , Why: Most orders are short-distance; a few are very long → right skew.
     
     data["Log_Distance"] = np.log1p(data["Distance"])
-    
     # Log transform Order_Cost , Why: Cheap orders dominate; expensive ones are rare outliers → right skew.
     
     data["Log_Order_Cost"] = np.log1p(data["Order_Cost"])
@@ -61,7 +58,6 @@ def feature_engineering(data):
     data["Traffic_Conditions_Enc"] = data["Traffic_Conditions"].map({"Low": 1, "Medium": 2, "High": 3})
     data["Order_Priority_Enc"] = data["Order_Priority"].map({"Low": 1, "Medium": 2, "High": 3})
     data["Order_Time_Enc"] = data["Order_Time"].map({"Morning": 1, "Afternoon": 2, "Evening": 3, "Night": 4})
-    
     # Label encoding for Vehicle_Type
     # Used for: Vehicle_Type (Bicycle, Bike, Car — 3 categories, no rank)
     # Why LabelEncoder? For tree models a single integer column is enough.
@@ -76,7 +72,7 @@ def feature_engineering(data):
     data = pd.get_dummies(data, columns=["Weather_Conditions"], prefix="Weather", dtype=int)
     print("\nStep 3 — Encoding done")
     print("Encoded columns:",["Traffic_Conditions_Enc", "Order_Priority_Enc","Order_Time_Enc", "Vehicle_Type_Enc",
-                                "Weather_Cloudy", "Weather_Rainy", "Weather_Snowy",  "Weather_Sunny"])
+                            "Weather_Cloudy", "Weather_Rainy", "Weather_Snowy",  "Weather_Sunny"])
 
     # Bring all numeric features to the same 0–1 range using MinMaxScaler.
     cols_to_scale = ["Distance","Haversine_Distance_km","Delivery_Person_Experience","Restaurant_Rating",
@@ -95,7 +91,6 @@ def feature_engineering(data):
     # FEATURE INTERACTION
     # Create new columns by combining two existing features.
     # Why: Some effects only appear when two features act together. e.g.:(Distance × Traffic)
-    # Why: A 20 km trip in heavy traffic is far worse than the sum of both.
     data["Distance_x_Traffic"] = data["Distance"].astype(float) * data["Traffic_Conditions_Enc"].astype(float)
     
     # Experience × Stress Score , Why: A senior rider handles bad weather + heavy traffic better than a rookie.
