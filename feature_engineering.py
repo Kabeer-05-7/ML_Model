@@ -16,7 +16,7 @@ def feature_engineering(data):
     a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
     data["Haversine_Distance_km"] = 2 * R * np.arcsin(np.sqrt(a))
     
-    # Is Peak Hour(binary flag: 1 = busy slot, 0 = quiet slot)
+    # Is Peak Hour(flag: 1 = busy slot, 0 = quiet slot)
     # Why: Afternoon & Evening have the highest order volume → longer delivery times.
     data["Is_Peak_Hour"] = data["Order_Time"].isin(["Afternoon", "Evening"]).astype(int)
     
@@ -35,14 +35,13 @@ def feature_engineering(data):
     data["Avg_Rating"] = (data["Restaurant_Rating"] + data["Customer_Rating"]) / 2
     
     print("\nStep 1 — Feature Creation done")
-    print("  New columns:", ["Haversine_Distance_km", "Is_Peak_Hour","Delivery_Stress_Score", "Avg_Rating"])
+    print(" New columns:", ["Haversine_Distance_km", "Is_Peak_Hour","Delivery_Stress_Score", "Avg_Rating"])
 
     # Reshape skewed numeric columns so their distribution is more symmetric.
     # Log transform Distance , Why: Most orders are short-distance; a few are very long → right skew.
     
     data["Log_Distance"] = np.log1p(data["Distance"])
     # Log transform Order_Cost , Why: Cheap orders dominate; expensive ones are rare outliers → right skew.
-    
     data["Log_Order_Cost"] = np.log1p(data["Order_Cost"])
     
     # Square-root transform Tip_Amount , Why: Many orders have zero tip — log(0) is undefined.
