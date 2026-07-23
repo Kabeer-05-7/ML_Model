@@ -59,7 +59,7 @@ def feature_engineering(data):
     data["Order_Time_Enc"] = data["Order_Time"].map({"Morning": 1, "Afternoon": 2, "Evening": 3, "Night": 4})
     # Label encoding for Vehicle_Type
     # Used for: Vehicle_Type (Bicycle, Bike, Car — 3 categories, no rank)
-    # Why LabelEncoder? For tree models a single integer column is enough.
+    # Used LabelEncoder For tree models a single integer column is enough.
     
     le = LabelEncoder()
     data["Vehicle_Type_Enc"] = le.fit_transform(data["Vehicle_Type"])
