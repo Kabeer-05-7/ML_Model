@@ -1,8 +1,9 @@
-from preprocessing import preprocess
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+
+from preprocessing import preprocess
+
 data = pd.read_csv("Food_Delivery_Time_Prediction.csv")
 data = preprocess(data)
 def feature_engineering(data):
@@ -34,7 +35,7 @@ def feature_engineering(data):
     
     data["Avg_Rating"] = (data["Restaurant_Rating"] + data["Customer_Rating"]) / 2
     
-    print("\nStep 1 — Feature Creation done")
+    print("\n—-----Feature Creation------")
     print(" New columns:", ["Haversine_Distance_km", "Is_Peak_Hour","Delivery_Stress_Score", "Avg_Rating"])
 
     # Reshape skewed numeric columns so their distribution is more symmetric.
@@ -48,7 +49,7 @@ def feature_engineering(data):
     # sqrt is a gentler compression that handles zeros safely.
     
     data["Sqrt_Tip_Amount"] = np.sqrt(data["Tip_Amount"])
-    print("\nStep 2 — Feature Transformation done")
+    print("\n—-------Feature Transformation----------")
     print("  New columns:", ["Log_Distance", "Log_Order_Cost", "Sqrt_Tip_Amount"])
 
     # Convert categorical text columns into numbers — models can't do maths on strings.
@@ -57,8 +58,7 @@ def feature_engineering(data):
     data["Traffic_Conditions_Enc"] = data["Traffic_Conditions"].map({"Low": 1, "Medium": 2, "High": 3})
     data["Order_Priority_Enc"] = data["Order_Priority"].map({"Low": 1, "Medium": 2, "High": 3})
     data["Order_Time_Enc"] = data["Order_Time"].map({"Morning": 1, "Afternoon": 2, "Evening": 3, "Night": 4})
-    # Label encoding for Vehicle_Type
-    # Used for: Vehicle_Type (Bicycle, Bike, Car — 3 categories, no rank)
+    # Label encoding for Vehicle_Type -> Used for: Vehicle_Type (Bicycle, Bike, Car —3 categories, no rank)
     # Used LabelEncoder For tree models a single integer column is enough.
     
     le = LabelEncoder()
@@ -69,7 +69,7 @@ def feature_engineering(data):
     # Used for: Weather_Conditions (Sunny, Cloudy, Rainy, Snowy — no rank)
     
     data = pd.get_dummies(data, columns=["Weather_Conditions"], prefix="Weather", dtype=int)
-    print("\nStep 3 — Encoding done")
+    print("\n-—---- Encoding--------")
     print("Encoded columns:",["Traffic_Conditions_Enc", "Order_Priority_Enc","Order_Time_Enc", "Vehicle_Type_Enc",
                             "Weather_Cloudy", "Weather_Rainy", "Weather_Snowy",  "Weather_Sunny"])
 
@@ -84,11 +84,10 @@ def feature_engineering(data):
     scaler = MinMaxScaler()
     data[cols_to_scale] = scaler.fit_transform(data[cols_to_scale])
     
-    print("\nStep 4 — Scaling done")
+    print("\n------— Scaling----------")
     print("Scaled columns:", cols_to_scale)
 
-    # FEATURE INTERACTION
-    # Create new columns by combining two existing features.
+    # FEATURE INTERACTION -> Create new columns by combining two existing features.
     # Why: Some effects only appear when two features act together. e.g.:(Distance × Traffic)
     data["Distance_x_Traffic"] = data["Distance"].astype(float) * data["Traffic_Conditions_Enc"].astype(float)
     
@@ -97,7 +96,7 @@ def feature_engineering(data):
     
     data["Experience_x_Stress"] = data["Delivery_Person_Experience"].astype(float) * data["Delivery_Stress_Score"]
     
-    print("\nStep 5 — Feature Interaction done")
+    print("\n-------— Feature Interaction----------")
     print("  Interaction columns:", ["Distance_x_Traffic", "Experience_x_Stress"])
 
     # Drop columns that have been replaced by encoded versions before saving.
@@ -110,12 +109,12 @@ def feature_engineering(data):
     data.drop(columns=cols_to_drop, inplace=True)
     
     data.to_csv("processed_data.csv", index=False)    # change path as needed
-    print("\nStep 6 — Saved to 'processed_data.csv'")
+    print("\n-----------Saved to 'processed_data.csv'--------------")
 
     # FINAL CHECK
-    print("\n── Final shape :", data.shape)
-    print("── Missing values :", data.isnull().sum().sum())
-    print("── Columns :\n", data.columns.tolist())
-    print("\n── First 2 rows ──\n", data.head(2))
+    # print("\n── Final shape :", data.shape)
+    # print("── Missing values :", data.isnull().sum().sum())
+    # print("── Columns :\n", data.columns.tolist())
+    # print("\n── First 2 rows ──\n", data.head(2))
     return data
 data = feature_engineering(data)
