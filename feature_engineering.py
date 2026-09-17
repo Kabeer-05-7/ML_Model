@@ -117,4 +117,4 @@ def feature_engineering(data):
     # print("── Columns :\n", data.columns.tolist())
     # print("\n── First 2 rows ──\n", data.head(2))
     return data
-data = feature_engineering(data)
+# data = feature_engineering(data)
