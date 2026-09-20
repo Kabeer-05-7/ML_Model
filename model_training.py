@@ -35,7 +35,7 @@ print(" Train shape:", X_train.shape, " Test shape:", X_test.shape)
 
 
 def evaluate(model, X_tr, y_tr, X_te, y_te):
-    """Fit a model, return test-set metrics and 5-fold CV RMSE."""
+    # fit the model and evaluate on the test set
     model.fit(X_tr, y_tr)
     pred = model.predict(X_te)
 
@@ -69,15 +69,9 @@ models = {
 
 if XGB_AVAILABLE:
     models["XGBoost"] = XGBRegressor(
-        n_estimators=400,
-        learning_rate=0.05,
-        max_depth=4,
-        subsample=0.9,
-        colsample_bytree=0.9,
-        random_state=42,
-        n_jobs=-1,
+        n_estimators=400, learning_rate=0.05, max_depth=4, subsample=0.9, colsample_bytree=0.9,
+        random_state=42, n_jobs=-1,
     )
-
 print("\n—-----Model Training & Evaluation------")
 results = {}
 for name, model in models.items():
@@ -110,5 +104,5 @@ if hasattr(best_model, "feature_importance_"):
     print(feature_importance.head(10))
 
 # Save the best model
-joblib.dump(best_model, "best_delivery_time_model.pkl")   # change path as needed
+joblib.dump(best_model, "best_delivery_time_model.pkl")
 print("\n-----------Saved best model to 'best_delivery_time_model.pkl'--------------")
