@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import KFold, cross_val_score, train_test_split
 
-# XGBoost is optional — fall back gracefully if it isn't installed
+# XGBoost
 try:
     from importlib import import_module
 
